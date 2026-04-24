@@ -14,7 +14,8 @@
   },
   "scripts": {
     "build": "node --eval \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
-    "check": "tsc --noEmit -p tsconfig.build.json && tsc --noEmit -p tsconfig.json"
+    "check": "tsc --noEmit -p tsconfig.build.json && tsc --noEmit -p tsconfig.json",
+    "prepack": "npm run build"
   },
   "files": [
     "dist"
@@ -27,6 +28,14 @@
     "plugin"
   ],
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tillkrischer/vitest-module-graph-reporter.git"
+  },
+  "homepage": "https://github.com/tillkrischer/vitest-module-graph-reporter#readme",
+  "bugs": {
+    "url": "https://github.com/tillkrischer/vitest-module-graph-reporter/issues"
+  },
   "peerDependencies": {
     "vite": "^6.4.1 || ^7.0.0",
     "vitest": "^3.2.4"
