@@ -65,3 +65,10 @@ npm run build
 npm run check
 npm test
 ```
+
+## Release
+
+- Pushes to `main` run `.github/workflows/publish.yml`.
+- The workflow publishes `packages/plugin` to npm when its `package.json` version is not already published.
+- Publishing is configured for npm trusted publishing, so no `NPM_TOKEN` GitHub secret is required.
+- npm still needs to be configured to trust the `tillkrischer/vitest-module-graph-reporter` GitHub repository as a publisher for `vitest-module-graph-reporter`.
