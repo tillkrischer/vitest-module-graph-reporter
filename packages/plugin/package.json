@@ -1,6 +1,6 @@
 {
   "name": "vitest-module-graph-reporter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Standalone Vitest reporter plugin that prints module graphs and enforces graph size thresholds.",
   "type": "module",
   "main": "./dist/index.js",

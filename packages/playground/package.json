@@ -8,6 +8,6 @@
     "test:watch": "npm run build --workspace vitest-module-graph-reporter && vitest"
   },
   "dependencies": {
-    "vitest-module-graph-reporter": "1.0.0"
+    "vitest-module-graph-reporter": "^1.0.1"
   }
 }
