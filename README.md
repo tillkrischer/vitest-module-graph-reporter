@@ -48,8 +48,6 @@ type ModuleGraphPluginOptions = {
 
 ## Notes
 
-- The plugin is designed for use from the Vitest `plugins` array via `configureVitest`.
-- `error` mode preserves the current Elektra behavior by failing the affected module after printing the graph.
 - The implementation relies on Vitest internals for module diagnostics and for mutating the underlying task result when a module must fail. Those integration points may require updates across future Vitest major versions.
 
 ## Development
