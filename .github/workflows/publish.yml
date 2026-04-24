@@ -39,8 +39,8 @@ jobs:
         id: package-version
         working-directory: packages/plugin
         run: |
-          package_name=$(npm pkg get name | tr -d '"')
-          package_version=$(npm pkg get version | tr -d '"')
+          package_name=$(npm pkg get name --workspaces=false | tr -d '"')
+          package_version=$(npm pkg get version --workspaces=false | tr -d '"')
 
           if npm view "$package_name@$package_version" version >/dev/null 2>&1; then
             echo "should_publish=false" >> "$GITHUB_OUTPUT"
