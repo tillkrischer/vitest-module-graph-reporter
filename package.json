@@ -1,0 +1,43 @@
+{
+  "name": "vitest-module-graph-plugin",
+  "version": "1.0.0",
+  "description": "Standalone Vitest plugin that prints module graphs and enforces graph size thresholds.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "vitest",
+    "vite",
+    "reporter",
+    "module-graph",
+    "plugin"
+  ],
+  "license": "ISC",
+  "peerDependencies": {
+    "vite": "^6.4.1 || ^7.0.0",
+    "vitest": "^3.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vite": "^6.4.1",
+    "vitest": "^3.2.4"
+  }
+}

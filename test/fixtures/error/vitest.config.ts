@@ -1,0 +1,20 @@
+import { defineConfig } from "vitest/config";
+
+import { moduleGraphReporterPlugin } from "../../../src";
+
+export default defineConfig({
+  plugins: [
+    moduleGraphReporterPlugin({
+      mode: "error",
+      maxModules: 1,
+      render: {
+        maxDepth: 4,
+        maxChildren: 10,
+      },
+    }),
+  ],
+  test: {
+    include: ["tests/**/*.test.ts"],
+    watch: false,
+  },
+});
