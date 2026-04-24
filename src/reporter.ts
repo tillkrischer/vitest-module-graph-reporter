@@ -242,20 +242,16 @@ const resolveRootModuleNode = (vitest: Vitest, moduleId: string) => {
   return null;
 };
 
-const createThresholdExceededError = (
+const formatThresholdExceededMessage = (
   rootLabel: string,
   moduleGraphSize: number,
   maxModules: number,
   lines: string[],
-): InternalTaskError => {
-  const error = new Error(
+) => {
+  return [
     `Module graph size threshold exceeded for ${rootLabel}: ${moduleGraphSize} modules (max ${maxModules})`,
-  ) as InternalTaskError;
-
-  error.type = "Module Graph Size Threshold Exceeded";
-  error.message = `${error.message}\n\nModule graph:\n${lines.join("\n")}`;
-
-  return error;
+    ...lines,
+  ].join("\n");
 };
 
 export class ModuleGraphReporter implements Reporter {
@@ -328,28 +324,19 @@ export class ModuleGraphReporter implements Reporter {
     }
 
     const existingError = this.moduleFailures.get(testModule.moduleId);
+    const errorMessage = formatThresholdExceededMessage(rootLabel, moduleGraphSize, this.options.maxModules, lines)
+    const errorType = "Module Graph Size Threshold Exceeded";
 
     if (existingError) {
-      existingError.type = "Module Graph Size Threshold Exceeded";
-      existingError.message = [
-        `Module graph size threshold exceeded for ${rootLabel}: ${moduleGraphSize} modules (max ${this.options.maxModules})`,
-        "",
-        "Module graph:",
-        ...lines,
-      ].join("\n");
+      existingError.type = errorType;
+      existingError.message = errorMessage;
 
       return existingError;
     }
 
-    const error = createThresholdExceededError(
-      rootLabel,
-      moduleGraphSize,
-      this.options.maxModules,
-      lines,
-    );
-
+    const error = new Error(errorMessage) as InternalTaskError;
+    error.type = errorType;
     this.moduleFailures.set(testModule.moduleId, error);
-
     return error;
   }
 
