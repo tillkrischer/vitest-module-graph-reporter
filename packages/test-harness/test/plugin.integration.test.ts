@@ -1,15 +1,16 @@
 import path from "node:path";
 import { createRequire } from "node:module";
 import { spawnSync } from "node:child_process";
+import { stripVTControlCharacters } from "node:util";
 
 import { describe, expect, it } from "vitest";
 
 const require = createRequire(import.meta.url);
 const vitestBin = require.resolve("vitest/vitest.mjs");
-const repositoryRoot = path.resolve(import.meta.dirname, "..");
+const packageRoot = path.resolve(import.meta.dirname, "..");
 
 const runFixture = (fixtureName: string) => {
-  const fixtureRoot = path.join(repositoryRoot, "test", "fixtures", fixtureName);
+  const fixtureRoot = path.join(packageRoot, "test", "fixtures", fixtureName);
   const result = spawnSync(process.execPath, [vitestBin, "run", "--config", "vitest.config.ts"], {
     cwd: fixtureRoot,
     encoding: "utf8",
@@ -17,7 +18,7 @@ const runFixture = (fixtureName: string) => {
 
   return {
     ...result,
-    output: `${result.stdout}\n${result.stderr}`,
+    output: stripVTControlCharacters(`${result.stdout}\n${result.stderr}`),
   };
 };
 

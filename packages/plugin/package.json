@@ -1,0 +1,34 @@
+{
+  "name": "vitest-module-graph-reporter",
+  "version": "1.0.0",
+  "description": "Standalone Vitest reporter plugin that prints module graphs and enforces graph size thresholds.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "node --eval \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
+    "check": "tsc --noEmit -p tsconfig.build.json && tsc --noEmit -p tsconfig.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "vitest",
+    "vite",
+    "reporter",
+    "module-graph",
+    "plugin"
+  ],
+  "license": "ISC",
+  "peerDependencies": {
+    "vite": "^6.4.1 || ^7.0.0",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "vitest-module-graph-reporter-test-harness",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "npm run build --workspace vitest-module-graph-reporter && tsc --noEmit -p tsconfig.json",
+    "test": "npm run build --workspace vitest-module-graph-reporter && vitest run"
+  },
+  "dependencies": {
+    "vitest-module-graph-reporter": "1.0.0"
+  }
+}

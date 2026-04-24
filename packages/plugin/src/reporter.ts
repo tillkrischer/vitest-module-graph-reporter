@@ -79,7 +79,8 @@ const getImportDurationCandidates = (moduleNode: ModuleNode) => {
 
 const getImportDuration = (importDurations: ImportDurationMap, moduleNode: ModuleNode) => {
   for (const candidate of getImportDurationCandidates(moduleNode)) {
-    const duration = importDurations[candidate] ?? importDurations[candidate.replace(/^\//, "file:///")];
+    const duration =
+      importDurations[candidate] ?? importDurations[candidate.replace(/^\//, "file:///")];
 
     if (duration) {
       return duration;
@@ -255,10 +256,10 @@ const formatThresholdExceededMessage = (
 };
 
 /**
-  * constraints:
-  * - exit code must be non-zero when threshold is exceeded and mode is "error"
-  * - the error should be recorded on an individual test case, not the entire module, to allow for better visibility in CI and IDEs
-  */
+ * constraints:
+ * - exit code must be non-zero when threshold is exceeded and mode is "error"
+ * - the error should be recorded on an individual test case, not the entire module, to allow for better visibility in CI and IDEs
+ */
 export class ModuleGraphReporter implements Reporter {
   constructor(private readonly options: NormalizedModuleGraphPluginOptions) {}
 
@@ -333,7 +334,12 @@ export class ModuleGraphReporter implements Reporter {
     }
 
     const existingError = this.moduleFailures.get(testModule.moduleId);
-    const errorMessage = formatThresholdExceededMessage(rootLabel, moduleGraphSize, this.options.maxModules, lines)
+    const errorMessage = formatThresholdExceededMessage(
+      rootLabel,
+      moduleGraphSize,
+      this.options.maxModules,
+      lines,
+    );
     const errorType = "Module Graph Size Threshold Exceeded";
 
     if (existingError) {
@@ -386,7 +392,7 @@ export class ModuleGraphReporter implements Reporter {
   }
 
   onTestModuleEnd(testModule: TestModule) {
-    let error = this.moduleFailures.get(testModule.moduleId) ?? this.evaluateModule(testModule, true);
+    const error = this.moduleFailures.get(testModule.moduleId) ?? this.evaluateModule(testModule, true);
 
     if (!error) {
       return;

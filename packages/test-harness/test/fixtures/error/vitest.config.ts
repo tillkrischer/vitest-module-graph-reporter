@@ -1,11 +1,11 @@
 import { defineConfig } from "vitest/config";
 
-import { moduleGraphReporterPlugin } from "../../../src";
+import { moduleGraphReporterPlugin } from "vitest-module-graph-reporter";
 
 export default defineConfig({
   plugins: [
     moduleGraphReporterPlugin({
-      mode: "warn",
+      mode: "error",
       maxModules: 1,
       render: {
         maxDepth: 4,
