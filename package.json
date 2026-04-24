@@ -3,11 +3,12 @@
   "private": true,
   "workspaces": [
     "packages/plugin",
-    "packages/test-harness"
+    "packages/test-harness",
+    "packages/playground"
   ],
   "scripts": {
     "build": "npm run build --workspace vitest-module-graph-reporter",
-    "check": "npm run check --workspace vitest-module-graph-reporter && npm run check --workspace vitest-module-graph-reporter-test-harness",
+    "check": "npm run check --workspace vitest-module-graph-reporter && npm run check --workspace vitest-module-graph-reporter-test-harness && npm run check --workspace vitest-module-graph-reporter-playground",
     "test": "npm run test --workspace vitest-module-graph-reporter-test-harness"
   },
   "devDependencies": {

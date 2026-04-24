@@ -1,0 +1,13 @@
+{
+  "name": "vitest-module-graph-reporter-playground",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit -p tsconfig.json",
+    "test": "npm run build --workspace vitest-module-graph-reporter && vitest run",
+    "test:watch": "npm run build --workspace vitest-module-graph-reporter && vitest"
+  },
+  "dependencies": {
+    "vitest-module-graph-reporter": "1.0.0"
+  }
+}

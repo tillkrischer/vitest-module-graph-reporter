@@ -52,10 +52,11 @@ type ModuleGraphPluginOptions = {
 
 ## Development
 
-This repository is an npm workspace with two packages:
+This repository is an npm workspace with three packages:
 
 - `packages/plugin`: the publishable `vitest-module-graph-reporter` package
 - `packages/test-harness`: private integration tests and fixture projects
+- `packages/playground`: private Vitest project for quick manual plugin testing
 
 Common commands still run from the repository root:
 
