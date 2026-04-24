@@ -27,7 +27,7 @@ describe("moduleGraphReporterPlugin", () => {
 
     expect(result.status).toBe(0);
     expect(result.output).toContain("✓ tests/large.warn.test.ts");
-    expect(result.output).toContain("Module graph size threshold exceeded");
+    expect(result.output).toContain("Warning: Module graph size threshold exceeded");
     expect(result.output).toContain("Module graph:");
   });
 

@@ -398,7 +398,7 @@ export class ModuleGraphReporter implements Reporter {
     const updatedError = this.evaluateModule(testModule, true) ?? error;
 
     if (this.options.mode === "warn") {
-      this.warn(updatedError.message);
+      this.warn(`Warning: ${updatedError.message}`);
 
       return;
     }
