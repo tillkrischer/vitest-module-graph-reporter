@@ -248,12 +248,14 @@ const createThresholdExceededError = (
   rootLabel: string,
   moduleGraphSize: number,
   maxModules: number,
+  lines: string[],
 ): InternalTaskError => {
   const error = new Error(
     `Module graph size threshold exceeded for ${rootLabel}: ${moduleGraphSize} modules (max ${maxModules})`,
   ) as InternalTaskError;
 
   error.type = "Module Graph Size Threshold Exceeded";
+  error.message = `${error.message}\n\nModule graph:\n${lines.join("\n")}`;
 
   return error;
 };
@@ -308,19 +310,12 @@ export class ModuleGraphReporter implements Reporter {
       new Set<string>(),
     );
 
-    this.log(`Module graph for ${rootLabel}`);
-
-    for (const line of lines) {
-      this.log(line);
-    }
-
-    this.log(`Total module graph size: ${moduleGraphSize} modules`);
 
     if (moduleGraphSize <= this.options.maxModules) {
       return;
     }
 
-    const error = createThresholdExceededError(rootLabel, moduleGraphSize, this.options.maxModules);
+    const error = createThresholdExceededError(rootLabel, moduleGraphSize, this.options.maxModules, lines);
 
     if (this.options.mode === "warn") {
       this.warn(error.message);
@@ -328,7 +323,6 @@ export class ModuleGraphReporter implements Reporter {
       return;
     }
 
-    this.log(error.message);
     this.failModule(testModule, error);
   }
 }
