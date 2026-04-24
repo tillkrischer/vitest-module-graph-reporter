@@ -254,6 +254,11 @@ const formatThresholdExceededMessage = (
   ].join("\n");
 };
 
+/**
+  * constraints:
+  * - exit code must be non-zero when threshold is exceeded and mode is "error"
+  * - the error should be recorded on an individual test case, not the entire module, to allow for better visibility in CI and IDEs
+  */
 export class ModuleGraphReporter implements Reporter {
   constructor(private readonly options: NormalizedModuleGraphPluginOptions) {}
 
@@ -273,7 +278,7 @@ export class ModuleGraphReporter implements Reporter {
     return this.vitest?.state.idMap.get(taskId) as InternalTask | undefined;
   }
 
-  private failTask(taskId: string, error: InternalTaskError) {
+  private failTask(taskId: string, error?: InternalTaskError) {
     const task = this.getInternalTask(taskId);
 
     if (!task) {
@@ -282,6 +287,10 @@ export class ModuleGraphReporter implements Reporter {
 
     task.result ??= {};
     task.result.state = "fail";
+
+    if (!error) {
+      return;
+    }
 
     if (!(task.result.errors ?? []).includes(error)) {
       task.result.errors = [...(task.result.errors ?? []), error];
@@ -361,6 +370,7 @@ export class ModuleGraphReporter implements Reporter {
 
     const moduleId = testCase.module.moduleId;
 
+    // only fail one test case per module
     if (this.modulesFailedViaTestCase.has(moduleId) || testCase.result().state === "skipped") {
       return;
     }
@@ -376,20 +386,18 @@ export class ModuleGraphReporter implements Reporter {
   }
 
   onTestModuleEnd(testModule: TestModule) {
-    const error = this.moduleFailures.get(testModule.moduleId) ?? this.evaluateModule(testModule, true);
+    let error = this.moduleFailures.get(testModule.moduleId) ?? this.evaluateModule(testModule, true);
 
     if (!error) {
       return;
     }
 
-    const updatedError = this.evaluateModule(testModule, true) ?? error;
-
     if (this.options.mode === "warn") {
-      this.warn(`Warning: ${updatedError.message}`);
+      this.warn(`Warning: ${error.message}`);
 
       return;
     }
 
-    this.failTask(testModule.id, updatedError);
+    this.failTask(testModule.id);
   }
 }
