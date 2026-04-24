@@ -26,17 +26,20 @@ describe("moduleGraphReporterPlugin", () => {
     const result = runFixture("warn");
 
     expect(result.status).toBe(0);
-    expect(result.output).toContain("Module graph for tests/large.warn.test.ts");
-    expect(result.output).toContain("Total module graph size:");
+    expect(result.output).toContain("✓ tests/large.warn.test.ts");
     expect(result.output).toContain("Module graph size threshold exceeded");
+    expect(result.output).toContain("Module graph:");
   });
 
-  it("prints the graph and fails the affected module in error mode", () => {
+  it("fails the affected test module and surfaces a red test in error mode", () => {
     const result = runFixture("error");
 
     expect(result.status).not.toBe(0);
-    expect(result.output).toContain("Module graph for tests/large.error.test.ts");
+    expect(result.output).toContain("❯ tests/large.error.test.ts");
+    expect(result.output).toContain("× error fixture > fails the module when the graph is too large");
     expect(result.output).toContain("Module graph size threshold exceeded");
+    expect(result.output).toContain("Failed Tests 1");
+    expect(result.output).toContain("Failed Suites 1");
     expect(result.output).toContain("tests/small.ok.test.ts");
   });
 });

@@ -46,7 +46,7 @@ export const moduleGraphReporterPlugin = (options: ModuleGraphPluginOptions = {}
       const reporters = normalizeConfiguredReporters(context.vitest.config.reporters);
 
       if (!hasReporter(reporters, moduleGraphReporter)) {
-        reporters.push(moduleGraphReporter);
+        reporters.unshift(moduleGraphReporter);
       }
 
       context.vitest.config.reporters = reporters as typeof context.vitest.config.reporters;

@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import type { ModuleNode } from "vite";
-import type { Reporter, TestModule, Vitest } from "vitest/node";
+import type { Reporter, TestCase, TestModule, Vitest } from "vitest/node";
 
 import type { NormalizedModuleGraphPluginOptions } from "./options";
 
@@ -21,10 +21,8 @@ type InternalTaskResult = {
   errors?: InternalTaskError[];
 };
 
-type TestModuleWithTask = TestModule & {
-  task: {
-    result?: InternalTaskResult;
-  };
+type InternalTask = {
+  result?: InternalTaskResult;
 };
 
 type MutableModuleGraph = {
@@ -264,6 +262,8 @@ export class ModuleGraphReporter implements Reporter {
   constructor(private readonly options: NormalizedModuleGraphPluginOptions) {}
 
   private vitest: Vitest | null = null;
+  private readonly moduleFailures = new Map<string, InternalTaskError>();
+  private readonly modulesFailedViaTestCase = new Set<string>();
 
   private log(message: string) {
     this.vitest?.logger.log(message);
@@ -273,29 +273,40 @@ export class ModuleGraphReporter implements Reporter {
     this.vitest?.logger.warn(message);
   }
 
-  private failModule(testModule: TestModule, error: InternalTaskError) {
-    const moduleTask = (testModule as TestModuleWithTask).task;
-
-    moduleTask.result ??= {};
-    moduleTask.result.state = "fail";
-    moduleTask.result.errors = [...(moduleTask.result.errors ?? []), error];
+  private getInternalTask(taskId: string) {
+    return this.vitest?.state.idMap.get(taskId) as InternalTask | undefined;
   }
 
-  onInit(vitest: Vitest) {
-    this.vitest = vitest;
-  }
+  private failTask(taskId: string, error: InternalTaskError) {
+    const task = this.getInternalTask(taskId);
 
-  onTestModuleEnd(testModule: TestModule) {
-    if (!this.vitest) {
+    if (!task) {
       return;
+    }
+
+    task.result ??= {};
+    task.result.state = "fail";
+
+    if (!(task.result.errors ?? []).includes(error)) {
+      task.result.errors = [...(task.result.errors ?? []), error];
+    }
+  }
+
+  private evaluateModule(testModule: TestModule, logIfMissing = false) {
+    if (!this.vitest) {
+      return null;
     }
 
     const rootModuleNode = resolveRootModuleNode(this.vitest, testModule.moduleId);
 
     if (!rootModuleNode) {
-      this.log(`Module graph for ${testModule.moduleId} could not be resolved.`);
+      if (logIfMissing) {
+        this.log(`Module graph for ${testModule.moduleId} could not be resolved.`);
+      }
 
-      return;
+      this.moduleFailures.delete(testModule.moduleId);
+
+      return null;
     }
 
     const rootLabel = getModuleNodeLabel(rootModuleNode, this.vitest.config.root);
@@ -310,19 +321,88 @@ export class ModuleGraphReporter implements Reporter {
       new Set<string>(),
     );
 
-
     if (moduleGraphSize <= this.options.maxModules) {
+      this.moduleFailures.delete(testModule.moduleId);
+
+      return null;
+    }
+
+    const existingError = this.moduleFailures.get(testModule.moduleId);
+
+    if (existingError) {
+      existingError.type = "Module Graph Size Threshold Exceeded";
+      existingError.message = [
+        `Module graph size threshold exceeded for ${rootLabel}: ${moduleGraphSize} modules (max ${this.options.maxModules})`,
+        "",
+        "Module graph:",
+        ...lines,
+      ].join("\n");
+
+      return existingError;
+    }
+
+    const error = createThresholdExceededError(
+      rootLabel,
+      moduleGraphSize,
+      this.options.maxModules,
+      lines,
+    );
+
+    this.moduleFailures.set(testModule.moduleId, error);
+
+    return error;
+  }
+
+  onTestRunStart() {
+    this.moduleFailures.clear();
+    this.modulesFailedViaTestCase.clear();
+  }
+
+  onInit(vitest: Vitest) {
+    this.vitest = vitest;
+  }
+
+  onTestModuleCollected(testModule: TestModule) {
+    this.modulesFailedViaTestCase.delete(testModule.moduleId);
+    this.evaluateModule(testModule);
+  }
+
+  onTestCaseResult(testCase: TestCase) {
+    if (this.options.mode !== "error") {
       return;
     }
 
-    const error = createThresholdExceededError(rootLabel, moduleGraphSize, this.options.maxModules, lines);
+    const moduleId = testCase.module.moduleId;
+
+    if (this.modulesFailedViaTestCase.has(moduleId) || testCase.result().state === "skipped") {
+      return;
+    }
+
+    const error = this.moduleFailures.get(moduleId) ?? this.evaluateModule(testCase.module);
+
+    if (!error) {
+      return;
+    }
+
+    this.failTask(testCase.id, error);
+    this.modulesFailedViaTestCase.add(moduleId);
+  }
+
+  onTestModuleEnd(testModule: TestModule) {
+    const error = this.moduleFailures.get(testModule.moduleId) ?? this.evaluateModule(testModule, true);
+
+    if (!error) {
+      return;
+    }
+
+    const updatedError = this.evaluateModule(testModule, true) ?? error;
 
     if (this.options.mode === "warn") {
-      this.warn(error.message);
+      this.warn(updatedError.message);
 
       return;
     }
 
-    this.failModule(testModule, error);
+    this.failTask(testModule.id, updatedError);
   }
 }
