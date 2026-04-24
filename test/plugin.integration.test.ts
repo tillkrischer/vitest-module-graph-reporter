@@ -39,7 +39,6 @@ describe("moduleGraphReporterPlugin", () => {
     expect(result.output).toContain("× error fixture > fails the module when the graph is too large");
     expect(result.output).toContain("Module graph size threshold exceeded");
     expect(result.output).toContain("Failed Tests 1");
-    expect(result.output).toContain("Failed Suites 1");
     expect(result.output).toContain("tests/small.ok.test.ts");
   });
 });

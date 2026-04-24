@@ -3,7 +3,7 @@ import path from "node:path";
 import type { ModuleNode } from "vite";
 import type { Reporter, TestCase, TestModule, Vitest } from "vitest/node";
 
-import type { NormalizedModuleGraphPluginOptions } from "./options";
+import type { NormalizedModuleGraphPluginOptions } from "./options.js";
 
 type ImportDuration = {
   selfTime: number;

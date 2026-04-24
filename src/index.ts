@@ -8,8 +8,8 @@ import {
   type ModuleGraphPluginMode,
   type ModuleGraphPluginOptions,
   type ModuleGraphRenderOptions,
-} from "./options";
-import { ModuleGraphReporter } from "./reporter";
+} from "./options.js";
+import { ModuleGraphReporter } from "./reporter.js";
 
 type ReporterConfigEntry = Reporter | string | [string, Record<string, unknown>];
 
