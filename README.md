@@ -1,18 +1,18 @@
-# vitest-module-graph-plugin
+# vitest-module-graph-reporter
 
 Standalone Vitest plugin that prints each test module's Vite module graph and can warn or fail when the graph grows past a configured threshold.
 
 ## Installation
 
 ```bash
-npm install -D vitest-module-graph-plugin
+npm install -D vitest-module-graph-reporter
 ```
 
 ## Usage
 
 ```ts
 import { defineConfig } from "vitest/config";
-import { moduleGraphReporterPlugin } from "vitest-module-graph-plugin";
+import { moduleGraphReporterPlugin } from "vitest-module-graph-reporter";
 
 export default defineConfig({
   plugins: [
